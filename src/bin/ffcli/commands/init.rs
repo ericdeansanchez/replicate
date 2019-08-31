@@ -1,9 +1,10 @@
 use std::env;
-use std::io::{self, Write};
-use std::process::{exit, Command, Output};
+use std::io;
+use std::process::{Command, Output};
 
 use ffcli::command_prelude::{App, Arg, SubCommand};
 use ffcli::{FfcliError, Result};
+use ffcli::util::fail_loudly_then_exit;
 
 pub fn cli() -> App {
     SubCommand::with_name("init")
@@ -21,11 +22,9 @@ pub fn init(app: String) -> Result<()> {
             if output.status.success() {
                 restructure_app(app)
             } else {
-                io::stderr().write_fmt(format_args!(
+                fail_loudly_then_exit(format!(
                     "error: call to `cargo new {}` failed, exiting...",
-                    &app
-                ))?;
-                exit(1);
+                    &app))
             }
         }
         Err(e) => Err(FfcliError::Io(e)),
