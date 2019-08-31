@@ -3,8 +3,8 @@ use std::io;
 use std::process::{Command, Output};
 
 use ffcli::command_prelude::{App, Arg, SubCommand};
-use ffcli::{FfcliError, Result};
 use ffcli::util::fail_loudly_then_exit;
+use ffcli::{FfcliError, Result};
 
 pub fn cli() -> App {
     SubCommand::with_name("init")
@@ -24,7 +24,8 @@ pub fn init(app: String) -> Result<()> {
             } else {
                 fail_loudly_then_exit(format!(
                     "error: call to `cargo new {}` failed, exiting...",
-                    &app))
+                    &app
+                ))
             }
         }
         Err(e) => Err(FfcliError::Io(e)),
