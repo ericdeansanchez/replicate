@@ -12,10 +12,10 @@ const FFCLI_APPNAME: &str = "FFCLI_APPNAME";
 
 pub fn cli() -> App {
     SubCommand::with_name("init")
-        .about("Initialize a FFCLI app.")
+        .about("Example init command.")
         .arg(
             Arg::with_name("name")
-                .help("The name of the cli application")
+                .help("The name of argument to init.")
                 .required(true),
         )
 }
@@ -67,32 +67,58 @@ fn create_bin(app: &str) -> Result<()> {
 fn populate_bin<P: AsRef<Path>>(path: P) -> Result<()> {
     write_main_rs(path.as_ref())?;
     write_cli_rs(path.as_ref())?;
+    create_commands(path.as_ref())?;
     Ok(())
 }
 
 fn write_main_rs<P: AsRef<Path>>(path: P) -> Result<()> {
     let main = path.as_ref().join("main.rs");
-    let contents = r#"fn main() -> Result<()> {
-    Ok(())
-}    
-"#;
+    let app_name = get_app_name();
+    let contents = format!(
+        r#"use std::process::exit;
+
+use {AppName}::Result;
+
+// Module Declarations.
+mod cli;
+mod commands;
+
+fn main() -> Result<()> {{
+    Ok(run(cli::app())?)
+}}
+
+/// Executes a cli app. This function parses the command line arguments and
+/// maps a given command to _its_ executor.
+fn run(app: clap::App<'static, 'static>) -> Result<()> {{
+    match app.get_matches().subcommand() {{
+        _ => {{
+            exit(1);
+        }}
+    }}
+}}
+"#,
+        AppName = app_name
+    );
+
     Ok(ffcli_io::write(&main, contents.as_bytes())?)
 }
 
 fn write_cli_rs<P: AsRef<Path>>(path: P) -> Result<()> {
     let cli = path.as_ref().join("cli.rs");
-    let contents = r#"//! # Generates the top-level cli.
+    let app_name = get_app_name();
+    let contents = format!(
+        r#"//! # Generates the top-level cli.
 use crate::commands;
-use ffcli::command_prelude::*;
+use {AppName}::command_prelude::*;
 
 /// Builds an `App`. This `App` is comprised of information read from cargo
 /// environment variables, a list of settings, and a list of a list of all
 /// supported sub-commands.
-pub fn app() -> App {
+pub fn app() -> App {{
     App::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
         .author(env!("CARGO_PKG_AUTHORS"))
-        .about("CARGO_PKG_DESCRIPTION")
+        .about(env!("CARGO_PKG_DESCRIPTION"))
         .settings(&[
             AppSettings::UnifiedHelpMessage,
             AppSettings::DeriveDisplayOrder,
@@ -101,9 +127,54 @@ pub fn app() -> App {
             AppSettings::SubcommandRequiredElseHelp,
         ])
         .subcommands(commands::all_sub_commands())
-}
-"#;
+}}
+"#,
+        AppName = app_name
+    );
     Ok(ffcli_io::write(&cli, contents.as_bytes())?)
+}
+
+fn create_commands<P: AsRef<Path>>(path: P) -> Result<()> {
+    let commands = path.as_ref().join("commands");
+    fs::create_dir_all(&commands)?;
+    write_commands_mod_rs(commands.join("mod.rs"))?;
+    write_command_init_rs(commands.join("init.rs"))?;
+    Ok(())
+}
+
+fn write_commands_mod_rs<P: AsRef<Path>>(path: P) -> Result<()> {
+    let app_name = get_app_name();
+    let contents = format!(
+        r#"use {AppName}::command_prelude::*;
+
+pub fn all_sub_commands() -> Vec<App> {{
+    vec![init::cli()]
+}}
+
+pub mod init;
+"#,
+        AppName = app_name
+    );
+    Ok(ffcli_io::write(path.as_ref(), contents.as_bytes())?)
+}
+
+fn write_command_init_rs<P: AsRef<Path>>(path: P) -> Result<()> {
+    let app_name = get_app_name();
+    let contents = format!(
+        r#"use {AppName}::command_prelude::{{App, Arg, SubCommand}};
+
+pub fn cli() -> App {{
+    SubCommand::with_name("init")
+        .about("Initialize a FFCLI app.")
+        .arg(
+            Arg::with_name("name")
+                .help("The name of the cli application")
+                .required(true),
+        )
+}}"#,
+        AppName = app_name
+    );
+    Ok(ffcli_io::write(path.as_ref(), contents.as_bytes())?)
 }
 
 fn create_lib(app: &str) -> Result<()> {
@@ -121,12 +192,19 @@ fn populate_lib<P: AsRef<Path>>(path: P) -> Result<()> {
 
 fn write_lib_rs<P: AsRef<Path>>(path: P) -> Result<()> {
     let lib = path.as_ref().join("lib.rs");
-    let contents = r#"// Module declarations.
+    let app_name = get_app_name();
+    let contents = format!(
+        r#"// Module declarations.
 pub mod util;
 
 /// Re-exports.
 pub use util::command_prelude;
-"#;
+// Note: You should covert the AppName to upper camel case,
+// e.g. AppNameError
+pub use util::errors::{{ {AppName}Error, Result}};
+"#,
+        AppName = app_name
+    );
     Ok(ffcli_io::write(&lib, contents.as_bytes())?)
 }
 
@@ -138,9 +216,20 @@ fn write_util<P: AsRef<Path>>(path: P) -> Result<()> {
 }
 
 fn populate_util<P: AsRef<Path>>(path: P) -> Result<()> {
+    write_util_mod_rs(&path)?;
     write_command_prelude_rs(&path)?;
     write_errors_rs(&path)?;
     Ok(())
+}
+
+fn write_util_mod_rs<P: AsRef<Path>>(path: P) -> Result<()> {
+    let mod_rs = path.as_ref().join("mod.rs");
+    let contents = r#"/// Utility module declarations.
+pub mod command_prelude;
+pub mod errors;
+"#;
+
+    Ok(ffcli_io::write(&mod_rs, contents.as_bytes())?)
 }
 
 fn write_command_prelude_rs<P: AsRef<Path>>(path: P) -> Result<()> {
@@ -192,8 +281,10 @@ pub type Result<T> = std::result::Result<T, {AppName}Error>;
 fn update_cargo_toml<P: AsRef<Path>>(path: P) -> Result<()> {
     let app_name = get_app_name();
     let contents = format!(
-        r#"# Be sure to add clap as a dependency.
-# clap = "*"
+        r#"# ffcli aims to be reasonably generic, if you want
+# to use a specific version of clap, you should change the
+# following to that version (e.g. clap = "2.33.0").
+clap = "*"
 
 [lib]
 name = "{AppName}"

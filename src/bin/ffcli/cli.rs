@@ -9,7 +9,7 @@ pub fn app() -> App {
     App::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
         .author(env!("CARGO_PKG_AUTHORS"))
-        .about("CARGO_PKG_DESCRIPTION")
+        .about(env!("CARGO_PKG_DESCRIPTION"))
         .settings(&[
             AppSettings::UnifiedHelpMessage,
             AppSettings::DeriveDisplayOrder,
