@@ -52,6 +52,7 @@ fn restructure_app(app: String) -> Result<()> {
     ffcli_io::remove_file(src.join("main.rs"))?;
     create_bin(&app)?;
     create_lib(&app)?;
+    update_cargo_toml(current_dir.join(&app).join("Cargo.toml"))?;
     env::set_current_dir(&current_dir)?;
     Ok(())
 }
@@ -159,17 +160,14 @@ pub type App = clap::App<'static, 'static>;
 
 fn write_errors_rs<P: AsRef<Path>>(path: P) -> Result<()> {
     let errors = path.as_ref().join("errors.rs");
-    let app_name = match env::var_os(FFCLI_APPNAME) {
-        Some(os) => os
-            .to_str()
-            .map(String::from)
-            .unwrap_or(String::from("AppName")),
-        None => String::from("AppName"),
-    };
-
+    let app_name = get_app_name();
     let contents = format!(
         r#"//! Primary error structures for {AppName}.
 use std::io;
+
+// Note: ffcli can bring in a third-party crate to title-case
+// AppName, however, if you're using RLS, then this will be
+// caught by the linter.
 
 /// Error types for {AppName}.
 #[derive(Debug)]
@@ -189,4 +187,35 @@ pub type Result<T> = std::result::Result<T, {AppName}Error>;
         AppName = app_name
     );
     Ok(ffcli_io::write(&errors, contents.as_bytes())?)
+}
+
+fn update_cargo_toml<P: AsRef<Path>>(path: P) -> Result<()> {
+    let app_name = get_app_name();
+    let contents = format!(
+        r#"# Be sure to add clap as a dependency.
+# clap = "*"
+
+[lib]
+name = "{AppName}"
+path = "src/{AppName}/lib.rs"
+"#,
+        AppName = app_name
+    );
+
+    if fs::metadata(path.as_ref()).is_ok() {
+        ffcli_io::append(path.as_ref(), contents.as_bytes())?;
+    } else {
+        fail_loudly_then_exit(format!("error: failed to retrieve Cargo.toml"))?;
+    }
+    Ok(())
+}
+
+fn get_app_name() -> String {
+    match env::var_os(FFCLI_APPNAME) {
+        Some(os) => os
+            .to_str()
+            .map(String::from)
+            .unwrap_or(String::from("AppName")),
+        None => String::from("AppName"),
+    }
 }

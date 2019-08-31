@@ -12,7 +12,7 @@ pub fn write<P: AsRef<Path>>(path: P, contents: &[u8]) -> Result<()> {
 }
 
 /// Write the contents to the given `path` in "append mode".
-pub fn append(path: &Path, contents: &[u8]) -> Result<()> {
+pub fn append<P: AsRef<Path>>(path: P, contents: &[u8]) -> Result<()> {
     let mut f = OpenOptions::new()
         .write(true)
         .append(true)
