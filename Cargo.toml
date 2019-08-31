@@ -2,6 +2,11 @@
 name = "ffcli"
 version = "0.1.0"
 authors = ["ericdeansanchez <ericdeansanchez@berkeley.edu>"]
+documentation = "https://github.com/ericdeansanchez/ffcli"
+homepage = "https://github.com/ericdeansanchez/ffcli"
+repository = "https://github.com/ericdeansanchez/ffcli"
+readme = "README.md"
+license = "MIT"
 edition = "2018"
 
 [lib]
