@@ -12,10 +12,10 @@ const FFCLI_APPNAME: &str = "FFCLI_APPNAME";
 
 pub fn cli() -> App {
     SubCommand::with_name("init")
-        .about("Example init command.")
+        .about("Initialize a FFCLI app.")
         .arg(
             Arg::with_name("name")
-                .help("The name of argument to init.")
+                .help("The name of the cli application")
                 .required(true),
         )
 }
@@ -165,10 +165,10 @@ fn write_command_init_rs<P: AsRef<Path>>(path: P) -> Result<()> {
 
 pub fn cli() -> App {{
     SubCommand::with_name("init")
-        .about("Initialize a FFCLI app.")
+        .about("Example init command.")
         .arg(
             Arg::with_name("name")
-                .help("The name of the cli application")
+                .help("The name of argument to init.")
                 .required(true),
         )
 }}"#,
