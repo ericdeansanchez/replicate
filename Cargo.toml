@@ -1,0 +1,12 @@
+[package]
+name = "ffcli"
+version = "0.1.0"
+authors = ["ericdeansanchez <ericdeansanchez@berkeley.edu>"]
+edition = "2018"
+
+[lib]
+name = "ffcli"
+path = "src/ffcli/lib.rs"
+
+[dependencies]
+clap = "2.33.0"
