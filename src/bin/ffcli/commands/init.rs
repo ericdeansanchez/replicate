@@ -1,5 +1,7 @@
 use std::env;
+use std::fs;
 use std::io;
+use std::path::Path;
 use std::process::{Command, Output};
 
 use ffcli::command_prelude::{App, Arg, SubCommand};
@@ -16,7 +18,11 @@ pub fn cli() -> App {
         )
 }
 
-pub fn init(app: String) -> Result<()> {
+pub fn exec(app: String) -> Result<()> {
+    init(app)
+}
+
+fn init(app: String) -> Result<()> {
     match call_cargo_new(&app) {
         Ok(output) => {
             if output.status.success() {
@@ -37,15 +43,17 @@ fn call_cargo_new(app: &str) -> io::Result<Output> {
 }
 
 fn restructure_app(app: String) -> Result<()> {
-    create_bin()?;
-    create_lib()?;
+    let app = env::current_dir()?.join(&app);
+    create_bin(&app)?;
+    create_lib(&app)?;
     Ok(())
 }
 
-fn create_bin() -> Result<()> {
+fn create_bin<P: AsRef<Path>>(app: P) -> Result<()> {
+    fs::create_dir_all(app.as_ref().join("src").join("bin"))?;
     Ok(())
 }
 
-fn create_lib() -> Result<()> {
+fn create_lib<P: AsRef<Path>>(app: P) -> Result<()> {
     Ok(())
 }

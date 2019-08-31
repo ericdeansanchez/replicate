@@ -1,5 +1,3 @@
-use std::path::{Path, PathBuf};
-
 // Module declarations.
 pub mod util;
 
@@ -7,11 +5,3 @@ pub mod util;
 /// `use kvs::command_prelude`.
 pub use util::command_prelude;
 pub use util::errors::{FfcliError, Result};
-
-pub struct Project {
-    root: PathBuf,
-    bin: PathBuf,
-    lib: PathBuf,
-}
-
-impl Project {}

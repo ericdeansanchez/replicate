@@ -14,8 +14,17 @@ fn main() -> Result<()> {
 /// maps a given command to _its_ executor.
 fn run(app: clap::App<'static, 'static>) -> Result<()> {
     match app.get_matches().subcommand() {
+        ("init", Some(args)) => init(args),
         _ => {
             exit(1);
         }
     }
+}
+
+fn init(args: &clap::ArgMatches) -> Result<()> {
+    let app_name = args
+        .value_of("name")
+        .map(String::from)
+        .expect("bug: an app name is required");
+    commands::init::exec(app_name)
 }
