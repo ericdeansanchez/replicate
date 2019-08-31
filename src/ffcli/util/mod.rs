@@ -1,3 +1,4 @@
+//! Utilities for ffcli.
 use std::io::{self, Write};
 use std::process::exit;
 

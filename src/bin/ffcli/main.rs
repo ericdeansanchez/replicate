@@ -1,3 +1,4 @@
+//! Main entry point for ffcli.
 use std::process::exit;
 
 use ffcli::Result;
@@ -21,6 +22,7 @@ fn run(app: clap::App<'static, 'static>) -> Result<()> {
     }
 }
 
+/// Executes the ffcli `init` command.
 fn init(args: &clap::ArgMatches) -> Result<()> {
     let app_name = args
         .value_of("name")
