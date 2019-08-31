@@ -5,10 +5,10 @@ use crate::commands;
 /// environment variables, a list of settings, and a list of a list of all
 /// supported sub-commands.
 pub fn app() -> App {
-    App::new(env!(stringify!(CARGO_PKG_NAME)))
-        .version(env!(stringify!(CARGO_PKG_VERSION)))
-        .author(env!(stringify!(CARGO_PKG_AUTHORS)))
-        .about(env!(stringify!(CARGO_PKG_DESCRIPTION)))
+    App::new(env!("CARGO_PKG_NAME"))
+        .version(env!("CARGO_PKG_VERSION"))
+        .author(env!("CARGO_PKG_AUTHORS"))
+        .about("CARGO_PKG_DESCRIPTION"))
         .settings(&[
             AppSettings::UnifiedHelpMessage,
             AppSettings::DeriveDisplayOrder,
