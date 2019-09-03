@@ -21,6 +21,7 @@ fn test_resulting_cli() {
 
 #[test]
 fn test_base_cli_output() -> io::Result<()> {
+    let current_dir = env::current_dir()?;
     let temp_dir = TempDir::new().expect("unable to create temporary working directory");
     let app_name = "test_app";
     let left = format!(
@@ -60,5 +61,6 @@ SUBCOMMANDS:
         .unwrap();
 
     assert!(right.contains(&left[..]));
+    env::set_current_dir(&current_dir)?;
     Ok(())
 }
