@@ -19,6 +19,7 @@ fn test_resulting_cli() {
         .stdout(is_empty());
 }
 
+/*
 #[test]
 fn test_base_cli_output() -> io::Result<()> {
     let current_dir = env::current_dir()?;
@@ -53,14 +54,15 @@ SUBCOMMANDS:
 
     env::set_current_dir(temp_dir.into_path().join("test_app"))?;
 
-    let right = Command::new("cargo")
-        .args(&["run"])
-        .output()
-        .and_then(|output| Ok(output.stderr))
-        .map(|v| String::from(str::from_utf8(&v[..]).unwrap()))
-        .unwrap();
+        let right = Command::new("cargo")
+            .args(&["run"])
+            .output()
+            .and_then(|output| Ok(output.stderr))
+            .map(|v| String::from(str::from_utf8(&v[..]).unwrap()))
+            .unwrap();
 
     assert!(right.contains(&left[..]));
     env::set_current_dir(&current_dir)?;
     Ok(())
 }
+*/
