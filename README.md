@@ -10,7 +10,6 @@ own command line interface.
 - [Replicate](#replicate)
   - [Overview](#overview)
   - [Table of Contents](#table-of-contents)
-  - [Requirements](#requirements)
   - [Installation](#installation)
   - [Example](#example)
 - [Contributing](#contributing)
@@ -20,13 +19,10 @@ own command line interface.
   - [Test](#test)
   - [Read](#read)
 
-## Requirements
-
 ## Installation
 
-
 ```
- $ comming soon!
+ $ brew install ericdeansanchez/heimdallr/replicate
 ```
 
 ## Example
