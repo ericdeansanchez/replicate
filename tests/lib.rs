@@ -2,19 +2,17 @@ use std::env;
 use std::io;
 use std::str;
 
-use ffcli::Result;
-
 use assert_cmd::prelude::*;
-use predicates::str::{is_empty, PredicateStrExt};
+use predicates::str::is_empty;
 use std::process::Command;
 use tempfile::TempDir;
 
 #[test]
 fn test_resulting_cli() {
     let temp_dir = TempDir::new().expect("unable to create temporary working directory");
-    Command::cargo_bin("ffcli")
+    Command::cargo_bin("replicate")
         .unwrap()
-        .args(&["init", "test_app"])
+        .args(&["cli", "test_app"])
         .current_dir(&temp_dir)
         .assert()
         .success()
@@ -24,8 +22,9 @@ fn test_resulting_cli() {
 #[test]
 fn test_base_cli_output() -> io::Result<()> {
     let temp_dir = TempDir::new().expect("unable to create temporary working directory");
+    let app_name = "test_app";
     let left = format!(
-        r#"test_app 0.1.0
+        r#"{AppName} 0.1.0
 {Authors}
 
 
@@ -40,12 +39,13 @@ SUBCOMMANDS:
     init    Example init command.
     help    Prints this message or the help of the given subcommand(s)
 "#,
+        AppName = app_name,
         Authors = env!("CARGO_PKG_AUTHORS")
     );
 
-    Command::cargo_bin("ffcli")
+    Command::cargo_bin("replicate")
         .expect("failed to unwrap in test_base_cli")
-        .args(&["init", "test_app"])
+        .args(&["cli", "test_app"])
         .current_dir(&temp_dir)
         .assert()
         .success();

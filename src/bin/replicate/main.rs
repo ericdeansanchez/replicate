@@ -1,7 +1,7 @@
-//! Main entry point for ffcli.
+//! Main entry point for replicate.
 use std::process::exit;
 
-use ffcli::Result;
+use replicate::Result;
 
 mod cli;
 mod commands;
@@ -15,14 +15,14 @@ fn main() -> Result<()> {
 /// maps a given command to _its_ executor.
 fn run(app: clap::App<'static, 'static>) -> Result<()> {
     match app.get_matches().subcommand() {
-        ("init", Some(args)) => init(args),
+        ("cli", Some(args)) => init(args),
         _ => {
             exit(1);
         }
     }
 }
 
-/// Executes the ffcli `init` command.
+/// Executes the replicate `init` command.
 fn init(args: &clap::ArgMatches) -> Result<()> {
     let app_name = args
         .value_of("name")

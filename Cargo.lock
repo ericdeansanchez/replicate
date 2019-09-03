@@ -91,16 +91,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ffcli"
-version = "0.1.0"
-dependencies = [
- "assert_cmd 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "predicates 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "tempfile 3.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
 name = "float-cmp"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -270,6 +260,16 @@ version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "winapi 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "replicate"
+version = "0.1.0"
+dependencies = [
+ "assert_cmd 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "predicates 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "tempfile 3.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

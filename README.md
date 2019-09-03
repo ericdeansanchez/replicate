@@ -1,11 +1,13 @@
-# Seidr
+# Replicate
 
 ## Overview
+replicate is a tool to generate a more general version of its
+own command line interface.
 
 ## Table of Contents
 
 
-- [Seidr](#seidr)
+- [Replicate](#replicate)
   - [Overview](#overview)
   - [Table of Contents](#table-of-contents)
   - [Requirements](#requirements)
@@ -29,6 +31,28 @@
 
 ## Example
 
+Running `$ replicate cli app` will generate a rust crate with
+the structure depicted below:
+
+```text
+app/
+├── Cargo.toml
+└── src
+    ├── app
+    │   ├── lib.rs
+    │   └── util
+    │       ├── command_prelude.rs
+    │       ├── errors.rs
+    │       └── mod.rs
+    └── bin
+        └── app
+            ├── cli.rs
+            ├── commands
+            │   ├── init.rs
+            │   └── mod.rs
+            └── main.rs
+```
+
 # Contributing
 
 Contributions are welcome! No contribution is too small––bug fix, a new feature,
@@ -39,7 +63,7 @@ or a typo fix––all are welcome.
 
 ## Prerequisites
 
-ffcli is written in Rust so make sure you have [Rust installed](https://www.rust-lang.org/tools/install).
+replicate is written in Rust so make sure you have [Rust installed](https://www.rust-lang.org/tools/install).
 
 
 ## Clone
@@ -47,7 +71,7 @@ ffcli is written in Rust so make sure you have [Rust installed](https://www.rust
 Clone the repository:
 
 ```bash
-$ git clone https://github.com/ericdeansanchez/ffcli.git
+$ git clone https://github.com/ericdeansanchez/replicate.git
 ```
 
 ## Build

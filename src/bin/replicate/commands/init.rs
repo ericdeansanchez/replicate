@@ -4,16 +4,16 @@ use std::io;
 use std::path::Path;
 use std::process::{Command, Output};
 
-use ffcli::command_prelude::{App, Arg, SubCommand};
-use ffcli::util::{fail_loudly_then_exit, ffcli_io};
-use ffcli::{FfcliError, Result};
+use replicate::command_prelude::{App, Arg, SubCommand};
+use replicate::util::{fail_loudly_then_exit, replicate_io};
+use replicate::{ReplicateError, Result};
 
-const FFCLI_APPNAME: &str = "FFCLI_APPNAME";
+const REPLICATE_APPNAME: &str = "REPLICATE_APPNAME";
 
 /// Constructs an `App` that is a `SubCommand::with_name` **init**.
 pub fn cli() -> App {
-    SubCommand::with_name("init")
-        .about("Initialize a FFCLI app.")
+    SubCommand::with_name("cli")
+        .about("Replicates a general purpose cli.")
         .arg(
             Arg::with_name("name")
                 .help("The name of the cli application")
@@ -40,10 +40,10 @@ fn init(app: String) -> Result<()> {
     match call_cargo_new(&app) {
         Ok(output) => {
             if output.status.success() {
-                // `cargo new {app}` succeed, set the FFCLI_APPNAME
+                // `cargo new {app}` succeed, set the REPLICATE_APPNAME
                 // environment variable to be `app` to be used later
                 // without having to carry around a string everywhere.
-                env::set_var(FFCLI_APPNAME, &app);
+                env::set_var(REPLICATE_APPNAME, &app);
                 restructure_app(app)
             } else {
                 fail_loudly_then_exit(format!(
@@ -52,11 +52,11 @@ fn init(app: String) -> Result<()> {
                 ))
             }
         }
-        Err(e) => Err(FfcliError::Io(e)),
+        Err(e) => Err(ReplicateError::Io(e)),
     }
 }
 
-/// Calls `cargo new {app}` in the directory in which ffcli was invoked.
+/// Calls `cargo new {app}` in the directory in which replicate was invoked.
 fn call_cargo_new(app: &str) -> io::Result<Output> {
     Command::new("cargo").arg("new").arg(app).output()
 }
@@ -64,7 +64,7 @@ fn call_cargo_new(app: &str) -> io::Result<Output> {
 /// Restructures the results of calling `cargo new {app}`.
 ///
 /// The bulk of the restructuring occurs in the crate's src directory.
-/// This function determines the current directory (where ffcli was invoked)
+/// This function determines the current directory (where replicate was invoked)
 /// and then changes the current directory to src.
 ///
 /// Once within the src directory the main.rs file created by `cargo new {app}`
@@ -72,7 +72,7 @@ fn call_cargo_new(app: &str) -> io::Result<Output> {
 /// with their appropriate contents).
 ///
 /// Finally, the cargo manifest (Cargo.toml) is updated to reflect the changes
-/// before returning to the directory from which `ffcli init {app}` was
+/// before returning to the directory from which `replicate init {app}` was
 /// envoked.
 fn restructure_app(app: String) -> Result<()> {
     // Determine the current directory, so that we can return to it later.
@@ -82,7 +82,7 @@ fn restructure_app(app: String) -> Result<()> {
     // Set the src directory to be the current directory.
     env::set_current_dir(&src)?;
     // Remove the old main.rs file.
-    ffcli_io::remove_file(src.join("main.rs"))?;
+    replicate_io::remove_file(src.join("main.rs"))?;
     // Create the bin subdirectory and populate it with its contents.
     create_bin(&app)?;
     // Create the lib subdirectory and populate it with its contents.
@@ -140,7 +140,7 @@ fn run(app: clap::App<'static, 'static>) -> Result<()> {{
         AppName = app_name
     );
 
-    Ok(ffcli_io::write(&main, contents.as_bytes())?)
+    Ok(replicate_io::write(&main, contents.as_bytes())?)
 }
 
 fn write_cli_rs<P: AsRef<Path>>(path: P) -> Result<()> {
@@ -171,7 +171,7 @@ pub fn app() -> App {{
 "#,
         AppName = app_name
     );
-    Ok(ffcli_io::write(&cli, contents.as_bytes())?)
+    Ok(replicate_io::write(&cli, contents.as_bytes())?)
 }
 
 fn create_commands<P: AsRef<Path>>(path: P) -> Result<()> {
@@ -195,7 +195,7 @@ pub mod init;
 "#,
         AppName = app_name
     );
-    Ok(ffcli_io::write(path.as_ref(), contents.as_bytes())?)
+    Ok(replicate_io::write(path.as_ref(), contents.as_bytes())?)
 }
 
 fn write_command_init_rs<P: AsRef<Path>>(path: P) -> Result<()> {
@@ -214,7 +214,7 @@ pub fn cli() -> App {{
 }}"#,
         AppName = app_name
     );
-    Ok(ffcli_io::write(path.as_ref(), contents.as_bytes())?)
+    Ok(replicate_io::write(path.as_ref(), contents.as_bytes())?)
 }
 
 /// Creates the lib subdirectory and populates it.
@@ -232,6 +232,7 @@ fn populate_lib<P: AsRef<Path>>(path: P) -> Result<()> {
     Ok(())
 }
 
+/// Writes contents to lib.rs.
 fn write_lib_rs<P: AsRef<Path>>(path: P) -> Result<()> {
     let lib = path.as_ref().join("lib.rs");
     let app_name = get_app_name();
@@ -247,9 +248,10 @@ pub use util::errors::{{ {AppName}Error, Result}};
 "#,
         AppName = app_name
     );
-    Ok(ffcli_io::write(&lib, contents.as_bytes())?)
+    Ok(replicate_io::write(&lib, contents.as_bytes())?)
 }
 
+/// Creates and populates the util subdirectory.
 fn write_util<P: AsRef<Path>>(path: P) -> Result<()> {
     let util = path.as_ref().join("util");
     fs::create_dir_all(&util)?;
@@ -257,6 +259,7 @@ fn write_util<P: AsRef<Path>>(path: P) -> Result<()> {
     Ok(())
 }
 
+/// Populates the util subdirectory.
 fn populate_util<P: AsRef<Path>>(path: P) -> Result<()> {
     write_util_mod_rs(&path)?;
     write_command_prelude_rs(&path)?;
@@ -271,7 +274,7 @@ pub mod command_prelude;
 pub mod errors;
 "#;
 
-    Ok(ffcli_io::write(&mod_rs, contents.as_bytes())?)
+    Ok(replicate_io::write(&mod_rs, contents.as_bytes())?)
 }
 
 fn write_command_prelude_rs<P: AsRef<Path>>(path: P) -> Result<()> {
@@ -286,7 +289,7 @@ pub use clap::{AppSettings, Arg, ArgMatches, SubCommand};
 pub type App = clap::App<'static, 'static>;
 "#;
 
-    Ok(ffcli_io::write(&prelude, contents.as_bytes())?)
+    Ok(replicate_io::write(&prelude, contents.as_bytes())?)
 }
 
 fn write_errors_rs<P: AsRef<Path>>(path: P) -> Result<()> {
@@ -296,7 +299,7 @@ fn write_errors_rs<P: AsRef<Path>>(path: P) -> Result<()> {
         r#"//! Primary error structures for {AppName}.
 use std::io;
 
-// Note: ffcli can bring in a third-party crate to title-case
+// Note: replicate can bring in a third-party crate to title-case
 // AppName, however, if you're using RLS, then this will be
 // caught by the linter.
 
@@ -317,13 +320,13 @@ pub type Result<T> = std::result::Result<T, {AppName}Error>;
 "#,
         AppName = app_name
     );
-    Ok(ffcli_io::write(&errors, contents.as_bytes())?)
+    Ok(replicate_io::write(&errors, contents.as_bytes())?)
 }
 
 fn update_cargo_toml<P: AsRef<Path>>(path: P) -> Result<()> {
     let app_name = get_app_name();
     let contents = format!(
-        r#"# ffcli aims to be reasonably generic, if you want
+        r#"# replicate aims to be reasonably generic, if you want
 # to use a specific version of clap, you should change the
 # following to that version (e.g. clap = "2.33.0").
 clap = "*"
@@ -336,7 +339,7 @@ path = "src/{AppName}/lib.rs"
     );
 
     if fs::metadata(path.as_ref()).is_ok() {
-        ffcli_io::append(path.as_ref(), contents.as_bytes())?;
+        replicate_io::append(path.as_ref(), contents.as_bytes())?;
     } else {
         fail_loudly_then_exit(format!("error: failed to retrieve Cargo.toml"))?;
     }
@@ -344,11 +347,11 @@ path = "src/{AppName}/lib.rs"
 }
 
 /// Gets the app name (that was set within a successful call to `init`)
-/// from the environment. If, for some reason, the `FFCLI_APPNAME` was
+/// from the environment. If, for some reason, the `REPLICATE_APPNAME` was
 /// not set and we've gotten this far, this function returns a dummy value
 /// and we let the user and compiler figure sort it out.
 fn get_app_name() -> String {
-    match env::var_os(FFCLI_APPNAME) {
+    match env::var_os(REPLICATE_APPNAME) {
         Some(os) => os
             .to_str()
             .map(String::from)

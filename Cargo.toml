@@ -1,17 +1,17 @@
 [package]
-name = "ffcli"
+name = "replicate"
 version = "0.1.0"
 authors = ["ericdeansanchez <ericdeansanchez@berkeley.edu>"]
-documentation = "https://github.com/ericdeansanchez/ffcli"
-homepage = "https://github.com/ericdeansanchez/ffcli"
-repository = "https://github.com/ericdeansanchez/ffcli"
+documentation = "https://github.com/ericdeansanchez/replicate"
+homepage = "https://github.com/ericdeansanchez/replicate"
+repository = "https://github.com/ericdeansanchez/replicate"
 readme = "README.md"
 license = "MIT"
 edition = "2018"
 
 [lib]
-name = "ffcli"
-path = "src/ffcli/lib.rs"
+name = "replicate"
+path = "src/replicate/lib.rs"
 
 [dependencies]
 clap = "2.33.0"

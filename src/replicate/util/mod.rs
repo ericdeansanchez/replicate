@@ -1,4 +1,4 @@
-//! Utilities for ffcli.
+//! Utilities for replicator.
 use std::io::{self, Write};
 use std::process::exit;
 
@@ -12,4 +12,4 @@ pub fn fail_loudly_then_exit(msg: String) -> Result<()> {
 /// Utility module declarations.
 pub mod command_prelude;
 pub mod errors;
-pub mod ffcli_io;
+pub mod replicate_io;
