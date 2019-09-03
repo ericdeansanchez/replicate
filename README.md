@@ -1,4 +1,5 @@
 # Replicate
+[![Build Status](https://travis-ci.org/ericdeansanchez/replicate.svg?branch=master)](https://travis-ci.org/ericdeansanchez/replicate)
 
 ## Overview
 replicate is a tool to generate a more general version of its
