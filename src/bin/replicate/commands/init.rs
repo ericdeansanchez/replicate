@@ -47,9 +47,16 @@ fn init(app: String) -> Result<()> {
                 env::set_var(REPLICATE_APPNAME, &app_name);
                 restructure_app(app)
             } else {
+                let msg = String::from_utf8(output.stderr)
+                    .expect("failed to convert to `String::from_utf8`");
                 fail_loudly_then_exit(format!(
-                    "error: call to `cargo new {}` failed, exiting...",
-                    &app
+                    r#"
+{Msg}
+error: call to `cargo new {AppName}` failed... exiting...
+
+"#,
+                    AppName = &app,
+                    Msg = &msg,
                 ))
             }
         }
