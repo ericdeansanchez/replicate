@@ -243,8 +243,7 @@ pub mod util;
 
 /// Re-exports.
 pub use util::command_prelude;
-// Note: You should covert the AppName to upper camel case,
-// e.g. AppNameError
+
 pub use util::errors::{{ {AppName}Error, Result}};
 "#,
         AppName = app_name
@@ -299,10 +298,6 @@ fn write_errors_rs<P: AsRef<Path>>(path: P) -> Result<()> {
     let contents = format!(
         r#"//! Primary error structures for {AppName}.
 use std::io;
-
-// Note: replicate can bring in a third-party crate to title-case
-// AppName, however, if you're using RLS, then this will be
-// caught by the linter.
 
 /// Error types for {AppName}.
 #[derive(Debug)]
