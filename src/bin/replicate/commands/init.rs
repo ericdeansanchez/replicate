@@ -43,7 +43,8 @@ fn init(app: String) -> Result<()> {
                 // `cargo new {app}` succeed, set the REPLICATE_APPNAME
                 // environment variable to be `app` to be used later
                 // without having to carry around a string everywhere.
-                env::set_var(REPLICATE_APPNAME, &app);
+                let app_name = up_case_first_char(app.clone());
+                env::set_var(REPLICATE_APPNAME, &app_name);
                 restructure_app(app)
             } else {
                 fail_loudly_then_exit(format!(
@@ -358,4 +359,18 @@ fn get_app_name() -> String {
             .unwrap_or(String::from("AppName")),
         None => String::from("AppName"),
     }
+}
+
+/// Converts the first `char` of a `String` to its uppercase equivalent.
+/// However, as this function uses an iterator over `char` values, which are
+/// represented by Unicode Scalar Values, this function is rather dumb. A better
+/// implementation would take something like grapheme clusters into account.
+fn up_case_first_char(name: String) -> String {
+    let mut chars = name.chars();
+    if let Some(c) = chars.next() {
+        let mut upper = c.to_uppercase().to_string();
+        upper.push_str(chars.as_str());
+        return upper;
+    }
+    name
 }
