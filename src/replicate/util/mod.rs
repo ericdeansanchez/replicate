@@ -5,7 +5,7 @@ use std::process::exit;
 use errors::Result;
 
 pub fn fail_loudly_then_exit(msg: String) -> Result<()> {
-    io::stderr().write(msg.as_bytes())?;
+    io::stderr().write_all(msg.as_bytes())?;
     exit(1);
 }
 
