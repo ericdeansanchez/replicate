@@ -36,6 +36,7 @@ pub fn exec(app: String) -> Result<()> {
 ///
 /// Otherwise, this function _fails loudly_ by printing an error message
 /// to a user's stderr before exiting.
+/// TODO: APPNAME IS CAPPED IN THE CARGO TOML MANIFEST FFFFFFFF
 fn init(app: String) -> Result<()> {
     match call_cargo_new(&app) {
         Ok(output) => {
@@ -43,8 +44,7 @@ fn init(app: String) -> Result<()> {
                 // `cargo new {app}` succeed, set the REPLICATE_APPNAME
                 // environment variable to be `app` to be used later
                 // without having to carry around a string everywhere.
-                let app_name = up_case_first_char(app.clone());
-                env::set_var(REPLICATE_APPNAME, &app_name);
+                env::set_var(REPLICATE_APPNAME, &app);
                 restructure_app(app)
             } else {
                 let msg = String::from_utf8(output.stderr)
@@ -243,7 +243,7 @@ fn populate_lib<P: AsRef<Path>>(path: P) -> Result<()> {
 /// Writes contents to lib.rs.
 fn write_lib_rs<P: AsRef<Path>>(path: P) -> Result<()> {
     let lib = path.as_ref().join("lib.rs");
-    let app_name = get_app_name();
+    let app_name = up_case_first_char(get_app_name());
     let contents = format!(
         r#"// Module declarations.
 pub mod util;
@@ -301,7 +301,7 @@ pub type App = clap::App<'static, 'static>;
 
 fn write_errors_rs<P: AsRef<Path>>(path: P) -> Result<()> {
     let errors = path.as_ref().join("errors.rs");
-    let app_name = get_app_name();
+    let app_name = up_case_first_char(get_app_name());
     let contents = format!(
         r#"//! Primary error structures for {AppName}.
 use std::io;
