@@ -26,6 +26,15 @@ own command line interface.
  $ brew install ericdeansanchez/heimdallr/replicate
 ```
 
+You can also **clone** the repository:
+
+`$ git clone https://github.com/ericdeansanchez/replicate.git`
+
+And then,
+
+`$ cargo run cli <name of your app>`
+
+
 ## Example
 
 Running `$ replicate cli app` will generate a rust crate with
